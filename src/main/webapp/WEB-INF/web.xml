@@ -6,14 +6,17 @@
 
     <display-name>Parapheur SOAP service provider</display-name>
 
+
+    <!--
     <filter>
         <filter-name>Spring Security Filter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>Spring Security Filter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/soap/v1/*</url-pattern>
     </filter-mapping>
+    -->
 
     <!-- Listeners -->
     <listener>
