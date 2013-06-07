@@ -12,6 +12,6 @@
 
     <import resource="classpath:cxf/cxf-endpoints.xml" />
     <import resource="classpath:spring/rmi-context.xml" />
-    <import resource="classpath:cxf/cxf-interceptors.xml" />
+    <!--import resource="classpath:cxf/cxf-interceptors.xml" /-->
 
 </beans>

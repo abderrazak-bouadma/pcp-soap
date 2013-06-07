@@ -35,7 +35,7 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
     @Override
     public DocumentContentVO getContent(String documentId) {
 
-        if (hasPermissionToAccessNode(documentId)) {
+      //  if (hasPermissionToAccessNode(documentId)) {
 
             //
             ParapheurNodeInformation nodeInformation = nodeService.getParapheurNodeInformation(documentId);
@@ -58,7 +58,7 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
                 contentVO.setDocumentId(documentId);
 
                 // init DataHandler
-                DataSource ds = new AttachmentDataSource("ctContent", fileInputStream);
+                DataSource ds = new AttachmentDataSource("application/pdf", fileInputStream);
                 contentVO.setContent(new DataHandler(ds));
 
                 // return the content
@@ -67,8 +67,8 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
             } catch (IOException e) {
                 throw new Fault(e);
             }
-        } else {
-            throw new Fault(new BusinessException(("Permission Denied")));
-        }
+        //} else {
+           // throw new Fault(new BusinessException(("Permission Denied")));
+       // }
     }
 }

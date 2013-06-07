@@ -6,6 +6,7 @@ import com.cdc.pcp.common.service.PCPUserService;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceContext;
@@ -24,6 +25,7 @@ public abstract class AbstractCommonService {
     PCPNodeService nodeService;
     @Autowired
     PCPUserService userService;
+    @Resource
     private WebServiceContext context;
 
     /**
