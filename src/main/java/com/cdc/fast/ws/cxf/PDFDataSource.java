@@ -11,7 +11,7 @@ import java.io.*;
 @Component
 public class PDFDataSource implements DataSource {
 
-    public static final String APPLICATION_PDF = "application/pdf";
+    public static final String APPLICATION_PDF = "text/html";
     private final String documentId;
     private PCPNodeService nodeService;
 
@@ -22,7 +22,7 @@ public class PDFDataSource implements DataSource {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream("c:/document.pdf"));
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream("c:/document.txt"));
         //FileInputStream fis = new FileInputStream("c:/document.pdf");
         //RemoteInputStream remoteInputStream = nodeService.getNodeInputStream(documentId);
         return bis;
@@ -40,6 +40,6 @@ public class PDFDataSource implements DataSource {
 
     @Override
     public String getName() {
-        return "INDICATE-DOCUMENT-NAME.pdf";
+        return "INDICATE-DOCUMENT-NAME.txt";
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.jws.WebService;
 
 @WebService(endpointInterface = "com.cdc.fast.ws.sei.DocumentService", portName = "DocumentPort", targetNamespace = "parapheur")
@@ -56,7 +57,8 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
 
         // DataSource
         DataSource ds = new PDFDataSource(nodeService, documentId);
-        DataHandler dh = new DataHandler(ds);
+        DataSource ds2 = new FileDataSource("c:/document.txt");
+        DataHandler dh = new DataHandler(ds2);
         contentVO.setContent(dh);
 
         // return the content
