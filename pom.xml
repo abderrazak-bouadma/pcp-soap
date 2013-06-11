@@ -31,6 +31,12 @@
                     <webApp>
                         <contextPath>/${artifactId}</contextPath>
                     </webApp>
+                    <connectors>
+                        <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+                            <port>9096</port>
+                            <maxIdleTime>90000</maxIdleTime>
+                        </connector>
+                    </connectors>
                     <scanIntervalSeconds>2</scanIntervalSeconds>
                     <stopPort>9999</stopPort>
                     <stopKey>${artifactId}-stop</stopKey>
@@ -44,6 +50,7 @@
             </plugin>
 
             <!-- cxf code generation plugin -->
+            <!--
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-java2ws-plugin</artifactId>
@@ -60,7 +67,6 @@
                         <version>${cxf.version}</version>
                     </dependency>
                 </dependencies>
-
                 <executions>
                     <execution>
                         <id>process-classes</id>
@@ -76,12 +82,13 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
     </build>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.version>2.7.4</cxf.version>
+        <cxf.version>2.7.5</cxf.version>
         <spring.version>3.2.1.RELEASE</spring.version>
         <guava.version>14.0.1</guava.version>
         <jetty.maven.plugin.version>8.1.11.v20130520</jetty.maven.plugin.version>
@@ -96,6 +103,11 @@
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <!-- Apache CXF -->
@@ -134,11 +146,23 @@
             <version>${guava.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <version>51.2</version>
+        </dependency>
+
         <!-- Parapheur Dependencies -->
         <dependency>
             <groupId>com.cdcfast</groupId>
             <artifactId>ParapheurCommun</artifactId>
             <version>${parapheur.commun.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.ibm.icu</groupId>
+                    <artifactId>icu4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>

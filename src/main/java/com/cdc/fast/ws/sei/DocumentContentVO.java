@@ -1,20 +1,15 @@
-package com.cdc.fast.ws.vo;
+package com.cdc.fast.ws.sei;
 
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.ws.BindingType;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Utilistateur
- * Date: 07/06/13
- * Time: 15:35
- * To change this template use File | Settings | File Templates.
- */
-@XmlRootElement(name = "documentContentVo")
+@XmlRootElement(name = "DocumentContentVO")
 @XmlAccessorType(XmlAccessType.FIELD)
+@BindingType(value = javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_MTOM_BINDING)
 public class DocumentContentVO {
 
     private String documentId;

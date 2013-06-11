@@ -1,22 +1,16 @@
 package com.cdc.fast.ws.cxf;
 
+import com.cdc.fast.ws.sei.DocumentContentVO;
 import com.cdc.fast.ws.sei.DocumentService;
-import com.cdc.fast.ws.vo.DocumentContentVO;
 import com.cdc.pcp.common.manager.Extension;
 import com.cdc.pcp.common.model.ParapheurNodeInformation;
 import com.cdc.pcp.common.service.PCPExtensionService;
 import com.cdc.pcp.spi.vo.DocumentVO;
-import com.healthmarketscience.rmiio.RemoteInputStream;
-import com.healthmarketscience.rmiio.RemoteInputStreamClient;
-import org.apache.cxf.attachment.AttachmentDataSource;
-import org.apache.cxf.interceptor.Fault;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.jws.WebService;
-import java.io.IOException;
-import java.io.InputStream;
 
 @WebService(endpointInterface = "com.cdc.fast.ws.sei.DocumentService", portName = "DocumentPort", targetNamespace = "parapheur")
 public class CXFDocumentService extends AbstractCommonService implements DocumentService {
@@ -35,40 +29,42 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
     @Override
     public DocumentContentVO getContent(String documentId) {
 
-      //  if (hasPermissionToAccessNode(documentId)) {
+        //  if (hasPermissionToAccessNode(documentId)) {
 
-            //
-            ParapheurNodeInformation nodeInformation = nodeService.getParapheurNodeInformation(documentId);
-            Extension extension = extensionService.getExtensionForFilename(nodeInformation.getFilename());
+        //
+        ParapheurNodeInformation nodeInformation = nodeService.getParapheurNodeInformation(documentId);
+        Extension extension = extensionService.getExtensionForFilename(nodeInformation.getFilename());
 
-            // setting some http headers in response
-            getHttpResponse().setHeader("Content-Length", String.valueOf(nodeInformation.getFileSize()));
-            getHttpResponse().setContentType(extension.contentType);
-            if (extension.isPragmaPrivate) {
-                getHttpResponse().setHeader("pragma", "private");
-            }
+        // setting some http headers in response
+        getHttpResponse().setHeader("Content-Length", String.valueOf(nodeInformation.getFileSize()));
+        getHttpResponse().setContentType(extension.contentType);
+        if (extension.isPragmaPrivate) {
+            getHttpResponse().setHeader("pragma", "private");
+        }
 
-            //
-            try {
-                RemoteInputStream remoteInputStream = nodeService.getNodeInputStream(documentId);
-                InputStream fileInputStream = RemoteInputStreamClient.wrap(remoteInputStream);
+        //
 
-                // prepare result
-                DocumentContentVO contentVO = new DocumentContentVO();
-                contentVO.setDocumentId(documentId);
+        // RemoteInputStream remoteInputStream = nodeService.getNodeInputStream(documentId);
+        // InputStream fileInputStream = RemoteInputStreamClient.wrap(remoteInputStream);
 
-                // init DataHandler
-                DataSource ds = new AttachmentDataSource("application/pdf", fileInputStream);
-                contentVO.setContent(new DataHandler(ds));
+        // prepare result
+        DocumentContentVO contentVO = new DocumentContentVO();
+        contentVO.setDocumentId(documentId);
 
-                // return the content
-                return contentVO;
+        //
+        getHttpResponse().setHeader("Content-Length", "2465121");
 
-            } catch (IOException e) {
-                throw new Fault(e);
-            }
+        // DataSource
+        DataSource ds = new PDFDataSource(nodeService, documentId);
+        DataHandler dh = new DataHandler(ds);
+        contentVO.setContent(dh);
+
+        // return the content
+        return contentVO;
+
+
         //} else {
-           // throw new Fault(new BusinessException(("Permission Denied")));
-       // }
+        // throw new Fault(new BusinessException(("Permission Denied")));
+        // }
     }
 }

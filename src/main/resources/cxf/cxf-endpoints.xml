@@ -11,8 +11,13 @@
        http://cxf.apache.org/jaxws
        http://cxf.apache.org/schemas/jaxws.xsd">
 
-    <!-- TODO should use context scanning to avoid to manually declare services (low priority)-->
     <jaxws:endpoint id="DocumentService" implementor="com.cdc.fast.ws.cxf.CXFDocumentService" address="/Documents">
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+
+    <jaxws:endpoint id="SampleService" implementor="com.cdc.fast.ws.cxf.CXFSampleService" address="/Samples">
         <jaxws:properties>
             <entry key="mtom-enabled" value="true"/>
         </jaxws:properties>

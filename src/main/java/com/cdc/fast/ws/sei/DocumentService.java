@@ -1,20 +1,21 @@
 package com.cdc.fast.ws.sei;
 
-import com.cdc.fast.ws.vo.DocumentContentVO;
 import com.cdc.pcp.spi.vo.DocumentVO;
 import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
 import javax.jws.WebService;
-import java.io.File;
 
 @WebService
 @DataBinding(value = JAXBDataBinding.class)
 public interface DocumentService {
-    @WebMethod(operationName = "documents")
+    @WebMethod(operationName = "getAllDocuments")
     DocumentVO[] all();
 
-    @WebMethod(operationName = "document.content")
-    DocumentContentVO getContent(String documentId);
+    @WebMethod(operationName = "getContent")
+    DocumentContentVO getContent(@WebParam(name = "documentId",mode = WebParam.Mode.IN) String documentId);
+
+
 }

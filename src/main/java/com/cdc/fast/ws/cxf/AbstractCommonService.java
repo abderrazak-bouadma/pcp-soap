@@ -11,13 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceContext;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Utilistateur
- * Date: 07/06/13
- * Time: 15:48
- * To change this template use File | Settings | File Templates.
- */
 public abstract class AbstractCommonService {
 
 
