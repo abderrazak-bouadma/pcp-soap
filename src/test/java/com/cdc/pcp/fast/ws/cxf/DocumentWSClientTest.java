@@ -40,8 +40,9 @@ public class DocumentWSClientTest {
         file.createNewFile();
         FileOutputStream outputStream = new FileOutputStream(file);
         byte[] buffer = new byte[1024];
-        while (inputStream.read(buffer) > -1) {
+        while (inputStream.read(buffer) > 0) {
             outputStream.write(buffer);
         }
+        outputStream.close();
     }
 }

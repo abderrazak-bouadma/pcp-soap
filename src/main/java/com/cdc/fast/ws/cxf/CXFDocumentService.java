@@ -10,10 +10,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.jws.WebService;
+import javax.mail.util.ByteArrayDataSource;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
+import javax.xml.soap.SOAPFault;
+import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.SOAPFaultException;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 @WebService(endpointInterface = "com.cdc.fast.ws.sei.DocumentService", portName = "DocumentPort", targetNamespace = "parapheur")
+// Below annotation activates MTOM, without this the PDF response
+// would be inlined as base64Binary within the SOAP response
+@BindingType(value = javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_MTOM_BINDING)
 public class CXFDocumentService extends AbstractCommonService implements DocumentService {
 
     @Autowired
@@ -53,13 +66,38 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
         contentVO.setDocumentId(documentId);
 
         //
-        getHttpResponse().setHeader("Content-Length", "2465121");
+        //getHttpResponse().setHeader("Content-Length", "4558");
 
         // DataSource
-        DataSource ds = new PDFDataSource(nodeService, documentId);
-        DataSource ds2 = new FileDataSource("c:/document.txt");
-        DataHandler dh = new DataHandler(ds2);
-        contentVO.setContent(dh);
+        //DataSource ds = new PDFDataSource(nodeService, documentId);
+        //DataSource ds2 = new FileDataSource("c:/logo.jpg");
+        //DataHandler dh = new DataHandler(ds2);
+        DataSource ds3 = null;
+        try {
+            InputStream inputStream =  new FileInputStream(new File("c:/document.pdf"));
+
+            /*
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            while (inputStream.read(buffer) != 0) {
+                byteArrayOutputStream.write(buffer);
+            }
+            */
+            ds3 = new ByteArrayDataSource(inputStream, "application/pdf");
+
+        } catch (Exception e) {
+            try {
+                SOAPFault fault = SOAPFactory.newInstance().createFault();
+                fault.setFaultString(e.getMessage());
+                fault.setFaultCode(new QName("URI_NS_SOAP_ENVELOPE", "Server"));
+                throw new SOAPFaultException(fault);
+            } catch (SOAPException e1) {
+                throw new RuntimeException("Problem downloading document : " + e1.getMessage());
+            }
+        }
+
+        //
+        contentVO.setContent(new DataHandler(ds3));
 
         // return the content
         return contentVO;
