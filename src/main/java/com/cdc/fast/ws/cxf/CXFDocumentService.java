@@ -74,7 +74,7 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
         //DataHandler dh = new DataHandler(ds2);
         DataSource ds3 = null;
         try {
-            InputStream inputStream =  new FileInputStream(new File("c:/document.pdf"));
+            InputStream inputStream =  new FileInputStream(new File("c:/test.pdf"));
 
             /*
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
