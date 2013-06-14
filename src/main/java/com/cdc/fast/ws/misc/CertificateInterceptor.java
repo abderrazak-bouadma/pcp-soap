@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 /**
  * X.509 Certificate interceptor
@@ -58,7 +57,7 @@ public class CertificateInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleFault(Message message) {
-         LOG.error("$$$$$$$$$$$$$$$$ SOAP FAULT : ACCESS DENIED");
+        LOG.error("$$$$$$$$$$$$$$$$ SOAP FAULT : ACCESS DENIED");
     }
 
     private UserInformation processLoginAttempt(String username, String password) throws Exception {

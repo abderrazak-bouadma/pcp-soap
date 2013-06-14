@@ -3,6 +3,7 @@ package com.cdc.pcp.fast.ws.cxf;
 import com.cdc.fast.ws.sei.DocumentContentVO;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.namespace.QName;
@@ -17,6 +18,7 @@ import java.io.InputStream;
  * Time: 18:20
  * To change this template use File | Settings | File Templates.
  */
+@Ignore
 public class DocumentWSClientTest {
 
     @Test
@@ -34,7 +36,7 @@ public class DocumentWSClientTest {
         DocumentContentVO documentContentVO = (DocumentContentVO) result[0];
         InputStream inputStream = documentContentVO.getContent().getInputStream();
         File file = new File("c:/job/test.pdf");
-        if (file.exists() ) {
+        if (file.exists()) {
             file.delete();
         }
         file.createNewFile();

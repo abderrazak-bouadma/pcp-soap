@@ -10,9 +10,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceContext;
+import java.util.logging.Logger;
 
 public abstract class AbstractCommonService {
 
+
+    private static final Logger logger = Logger.getLogger(AbstractCommonService.class.getName());
 
     @Autowired
     PCPNodeService nodeService;
@@ -25,7 +28,9 @@ public abstract class AbstractCommonService {
      * @return current username for the current authenticated user.
      */
     protected final String getUsername() {
-        return (String) getHttpRequest().getAttribute(CertificateHandler.USERNAME_HTTP_REQUEST_KEY);
+        String username = (String) getHttpRequest().getAttribute(CertificateHandler.USERNAME_HTTP_REQUEST_KEY);
+        logger.info("Authenticated USERNAME " + username);
+        return username;
     }
 
     /**
