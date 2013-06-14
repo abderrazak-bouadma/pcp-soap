@@ -8,6 +8,6 @@ import javax.jws.WebService;
 @WebService
 public interface SampleService {
 
-    @WebMethod(action = "getContent", operationName = "getContent")
+    @WebMethod(action = "download", operationName = "download")
     SampleVO get(@WebParam(name = "id", mode = WebParam.Mode.IN) String id);
 }

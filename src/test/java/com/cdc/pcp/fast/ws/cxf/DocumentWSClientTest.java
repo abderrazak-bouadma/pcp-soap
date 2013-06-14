@@ -24,8 +24,8 @@ public class DocumentWSClientTest {
 
         final String documentId = "931c43c0-66a1-4ca3-bd86-5195a8f9e3de";
         final String wsdl = "http://localhost/parapheur-soap/soap/v1/Documents?wsdl";
-        final String operation = "getContent";
-        final QName opName = new QName("http://sei.ws.fast.cdc.com/", "getContent");
+        final String operation = "download";
+        final QName opName = new QName("http://sei.ws.fast.cdc.com/", "download");
 
         //
         JaxWsDynamicClientFactory factory = JaxWsDynamicClientFactory.newInstance();

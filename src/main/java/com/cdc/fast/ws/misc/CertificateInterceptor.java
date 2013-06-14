@@ -58,7 +58,7 @@ public class CertificateInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleFault(Message message) {
-         LOG.error("$$$$$$$$$$$$$$$$ SOAP FAULT");
+         LOG.error("$$$$$$$$$$$$$$$$ SOAP FAULT : ACCESS DENIED");
     }
 
     private UserInformation processLoginAttempt(String username, String password) throws Exception {

@@ -22,8 +22,8 @@ public class SampleServiceTest {
         //
         final String id = "1";
         final String wsdl = "http://localhost/parapheur-soap/soap/v1/Samples?wsdl";
-        final String operation = "getContent";
-        final QName opName = new QName("http://sei.ws.fast.cdc.com/", "getContent");
+        final String operation = "download";
+        final QName opName = new QName("http://sei.ws.fast.cdc.com/", "download");
 
         //
         JaxWsDynamicClientFactory factory = JaxWsDynamicClientFactory.newInstance();

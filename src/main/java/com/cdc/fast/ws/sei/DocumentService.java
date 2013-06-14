@@ -8,11 +8,9 @@ import javax.jws.WebService;
 
 @WebService
 public interface DocumentService {
-    @WebMethod(operationName = "getAllDocuments")
-    DocumentVO[] all();
 
-    @WebMethod(operationName = "getContent")
-    DocumentContentVO getContent(@WebParam(name = "documentId",mode = WebParam.Mode.IN) String documentId);
+    @WebMethod(operationName = "download")
+    DocumentContentVO download(@WebParam(name = "documentId", mode = WebParam.Mode.IN) String documentId);
 
 
 }
