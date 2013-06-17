@@ -7,15 +7,14 @@ import com.cdc.pcp.common.model.Abonne;
 import com.cdc.pcp.common.model.ParapheurNodeInformation;
 import com.cdc.pcp.common.model.UserInformation;
 import com.cdc.pcp.common.service.PCPExtensionService;
+import com.cdc.pcp.common.service.PCPSubscriberService;
 import com.cdc.pcp.common.service.exception.UploadFileNodesException;
 import com.healthmarketscience.rmiio.RemoteInputStream;
 import com.healthmarketscience.rmiio.RemoteInputStreamClient;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
@@ -27,14 +26,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @WebService(endpointInterface = "com.cdc.fast.ws.sei.DocumentService", portName = "DocumentPort", targetNamespace = "documentTarget")
 public class CXFDocumentService extends AbstractCommonService implements DocumentService {
 
     private static final Logger logger = Logger.getLogger(CXFDocumentService.class.getName());
-
+    @Autowired
+    private PCPSubscriberService subscriberService;
     @Autowired
     private PCPExtensionService extensionService;
 
@@ -109,7 +111,7 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
             SOAPFault fault = null;
             try {
                 fault = SOAPFactory.newInstance().createFault();
-                fault.setFaultString("Erreur lors de la creqtion d'un fichier temporaire");
+                fault.setFaultString("Server Side Error : impossible to create a temporary file.\r\n" + e.getMessage());
                 throw new SOAPFaultException(fault);
             } catch (SOAPException e1) {
                 throw new RuntimeException(e1);

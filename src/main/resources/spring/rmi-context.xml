@@ -87,4 +87,9 @@
         <property name="serviceUrl" value="rmi://localhost:60500/pcpUserPreferenceService"/>
         <property name="serviceInterface" value="com.cdc.pcp.common.service.UserPreferenceService"/>
     </bean>
+
+    <bean id="pcpSubscriberService" parent="abstractPcpService">
+        <property name="serviceUrl" value="rmi://localhost:60500/pcpSubscriberService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPSubscriberService"/>
+    </bean>
 </beans>
