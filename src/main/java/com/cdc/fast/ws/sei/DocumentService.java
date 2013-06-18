@@ -1,6 +1,5 @@
 package com.cdc.fast.ws.sei;
 
-import javax.activation.DataHandler;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -23,6 +22,6 @@ public interface DocumentService {
     /**
      * uploads a document into Parapheur repository and returns the generated documentId
      */
-    String upload(@WebParam(name = "filename", mode = WebParam.Mode.IN) String filename, @WebParam(name = "label", mode = WebParam.Mode.IN) String label, @WebParam(name = "comment", mode = WebParam.Mode.IN) String comment, @WebParam(name = "circuit", mode = WebParam.Mode.IN) String circuit, @WebParam(name = "content", mode = WebParam.Mode.IN) DataHandler content);
+    String upload(@WebParam(name = "label", mode = WebParam.Mode.IN) String label, @WebParam(name = "comment", mode = WebParam.Mode.IN) String comment, @WebParam(name = "subscriberId", mode = WebParam.Mode.IN) String subscriberId, @WebParam(name = "circuitId", mode = WebParam.Mode.IN) String circuitId, @WebParam(name = "dataFile", mode = WebParam.Mode.IN) DataFile dataFile);
 
 }

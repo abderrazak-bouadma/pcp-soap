@@ -1,5 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>com.cdcfast</groupId>
+        <artifactId>fast_parent</artifactId>
+        <version>2.0</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.cdcfast</groupId>
     <artifactId>parapheur-soap</artifactId>
@@ -7,8 +14,22 @@
     <version>1.0.0-SNAPSHOT</version>
     <name>parapheur soap service</name>
     <url>http://maven.apache.org</url>
+
+    <scm>
+        <connection>scm:svn:https://svn.cdcfast.lan/svn/parapheur-soap</connection>
+    </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <cxf.version>2.7.5</cxf.version>
+        <spring.version>3.2.1.RELEASE</spring.version>
+        <guava.version>14.0.1</guava.version>
+        <jetty.maven.plugin.version>8.1.11.v20130520</jetty.maven.plugin.version>
+        <parapheur.commun.version>3.3.10-SNAPSHOT</parapheur.commun.version>
+        <spring.security.version>3.1.4.RELEASE</spring.security.version>
+    </properties>
+
     <build>
-        <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
             <!-- Java Compilation set 1.6 -->
             <plugin>
@@ -86,16 +107,6 @@
         </plugins>
     </build>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.version>2.7.5</cxf.version>
-        <spring.version>3.2.1.RELEASE</spring.version>
-        <guava.version>14.0.1</guava.version>
-        <jetty.maven.plugin.version>8.1.11.v20130520</jetty.maven.plugin.version>
-        <parapheur.commun.version>3.3.9-SNAPSHOT</parapheur.commun.version>
-        <spring.security.version>3.1.4.RELEASE</spring.security.version>
-    </properties>
-
     <dependencies>
         <!-- Test -->
         <dependency>
@@ -171,5 +182,178 @@
         </dependency>
     </dependencies>
 
+    <!-- Profiles -->
+    <profiles>
+
+        <!-- staging continous delivery profile -->
+        <profile>
+            <id>livraison-integration</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>2.3</version>
+                        <configuration>
+                            <webXml>${tomcat.staging.webXml}</webXml>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>livraison-integration</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks unless="livraison.integration.skip">
+
+                                        <!-- envoi du fichier WAR dans le repertoire de versionning d'integration -->
+                                        <scp
+                                                file="${project.build.directory}/${project.build.finalName}.war"
+                                                todir="root:fastpwd@parapheur.cdcfast.lan:/tomcat-parapheur-scope-verificateur-signature/appli/versionning"
+                                                trust="true"/>
+
+                                        <!-- lancement du deploiement sur le tomcat d'integration -->
+                                        <sshexec host="parapheur.cdcfast.lan" username="root"
+                                                 password="fastpwd"
+                                                 command="/tomcat-parapheur-scope-verificateur-signature/product/tomcat/bin/deploy-parapheur-soap.sh /tomcat-parapheur-scope-verificateur-signature/appli/versionning/${project.build.finalName}.war"
+                                                 trust="true"/>
+
+                                        <!-- attente du demarrage du parapheur-soap -->
+                                        <sleep seconds="10"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- milestone continous delivery profile -->
+        <profile>
+            <id>milestone</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>2.3</version>
+                        <configuration>
+                            <webXml>${tomcat.milestone.webXml}</webXml>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>livraison-integration</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks unless="livraison.integration.skip">
+
+                                        <!-- sends war to the milestone versionning repository -->
+                                        <scp
+                                                file="${project.build.directory}/${project.build.finalName}.war"
+                                                todir="root:fastpwd@parapheur.cdcfast.lan:/tomcat-milestone/repository/versionning"
+                                                trust="true"/>
+
+                                        <!-- call of deployment shell script -->
+                                        <sshexec host="parapheur.cdcfast.lan" username="root"
+                                                 password="fastpwd"
+                                                 command="/tomcat-milestone/bin/deploy-${project.artifactId}.sh /tomcat-milestone/repository/versionning/${project.build.finalName}.war"
+                                                 trust="true"/>
+
+                                        <sleep seconds="10"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Execution of integration/functional tests profile -->
+        <profile>
+            <id>FunctionalTests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*FunctionalTest.java</include>
+                            </includes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>verify</id>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- <plugin> <groupId>org.mortbay.jetty</groupId> <artifactId>jetty-maven-plugin</artifactId>
+                        <version>7.6.10.v20130312</version> <configuration> <overrideWebXml>${basedir}/src/test/resources/jetty/override-web.xml</overrideWebXml>
+                        <webAppConfig> <overrideDescriptor>${basedir}/src/test/resources/jetty/override-web.xml</overrideDescriptor>
+                        <contextPath>/${artifactId}</contextPath> </webAppConfig> <stopPort>9999</stopPort>
+                        </configuration> <executions> <execution> <id>start-jetty</id> <phase>pre-integration-test</phase>
+                        <goals> <goal>run</goal> </goals> <configuration> <scanIntervalSeconds>0</scanIntervalSeconds>
+                        <daemon>true</daemon> </configuration> </execution> <execution> <id>stop-jetty</id>
+                        <phase>post-integration-test</phase> <goals> <goal>stop</goal> </goals> </execution>
+                        </executions> </plugin> -->
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat6-maven-plugin</artifactId>
+                        <version>2.1</version>
+                        <configuration>
+                            <port>9095</port>
+                            <path>/parapheur-ws</path>
+                            <!-- tomcatWebXml>${basedir}/src/test/resources/jetty/override-web.xml</tomcatWebXml -->
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>run-tomcat</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop-tomcat</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

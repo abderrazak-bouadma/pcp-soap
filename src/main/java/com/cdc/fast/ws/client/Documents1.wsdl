@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="documentTarget" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://sei.ws.fast.cdc.com/" name="CXFDocumentServiceService" targetNamespace="documentTarget">
+  <wsdl:import location="http://parapheur.cdcfast.lan:8080/parapheur-soap/soap/v1/Documents?wsdl=DocumentService.wsdl" namespace="http://sei.ws.fast.cdc.com/">
+    </wsdl:import>
+  <wsdl:binding name="CXFDocumentServiceServiceSoapBinding" type="ns1:DocumentService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="download">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="download">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="downloadResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="upload">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="upload">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="uploadResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CXFDocumentServiceService">
+    <wsdl:port binding="tns:CXFDocumentServiceServiceSoapBinding" name="DocumentPort">
+      <soap:address location="http://parapheur.cdcfast.lan:8080/parapheur-soap/soap/v1/Documents"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,5 +1,6 @@
 package com.cdc.fast.ws.cxf;
 
+import com.cdc.fast.ws.sei.DataFile;
 import com.cdc.fast.ws.sei.DocumentContentVO;
 import com.cdc.fast.ws.sei.DocumentService;
 import com.cdc.pcp.common.manager.Extension;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-@WebService(endpointInterface = "com.cdc.fast.ws.sei.DocumentService", portName = "DocumentPort", targetNamespace = "documentTarget")
+@WebService(endpointInterface = "com.cdc.fast.ws.sei.DocumentService", portName = "DocumentPort", targetNamespace = "documentTarget", wsdlLocation = "https://proxy.cdcfast.lan/parapheur-soap/soap/v1/Documents?wsdl")
 public class CXFDocumentService extends AbstractCommonService implements DocumentService {
 
     private static final Logger logger = Logger.getLogger(CXFDocumentService.class.getName());
@@ -100,13 +101,32 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
     }
 
     @Override
-    public String upload(String filename, String label, String comment, String circuit, DataHandler content) {
+    public String upload(String label, String comment, String subscriberId, String circuitId, DataFile dataFile) {
 
         // create temp file
         File tempFile = null;
         try {
+
+            //
+            InputStream inputStream = dataFile.getDataHandler().getInputStream();
+
+            //
             tempFile = File.createTempFile("parapheur-", ".bin");
-            content.writeTo(new FileOutputStream(tempFile));
+            FileOutputStream outputStream = new FileOutputStream(tempFile);
+
+            //
+            byte[] buffer = new byte[1024];
+            int bytesRead = 0;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer);
+            }
+
+            //
+            outputStream.flush();
+            outputStream.close();
+            inputStream.close();
+
+
         } catch (IOException e) {
             SOAPFault fault = null;
             try {
@@ -123,9 +143,28 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
         String noderefId = null;
         try {
             UserInformation userInformation = userService.getUserInformation(getUsername());
-            Set<Abonne> abonnes = userInformation.getAbonnes();
-            // TODO Expose a SubscriberService for subscriber entity retrieve thorough Repository back end !!!
-            createdNodeRefs = nodeService.uploadFileNodes(Arrays.asList(new File[]{tempFile}), buildListOfOneElement(filename), buildListOfOneElement(label), buildListOfOneElement(comment), userInformation, circuit);
+            Set<Abonne> subscribers = subscriberService.getAbonneByUsername(getUsername());
+            for (Abonne subscriber : subscribers) {
+                if (subscriber.getSiren().equals(subscriberId)) {
+                    userInformation.setCurrentAbonne(subscriber);
+                    break;
+                }
+            }
+
+            //
+            if (userInformation.getCurrentAbonne() == null) {
+                SOAPFault fault = null;
+                try {
+                    fault = SOAPFactory.newInstance().createFault();
+                    fault.setFaultString("No current subscriber defined for current user or the subscriberId unknown.");
+                    throw new SOAPFaultException(fault);
+                } catch (SOAPException e1) {
+                    throw new RuntimeException(e1);
+                }
+            }
+
+
+            createdNodeRefs = nodeService.uploadFileNodes(Arrays.asList(new File[]{tempFile}), buildListOfOneElement(dataFile.getFilename()), buildListOfOneElement(label), buildListOfOneElement(comment), userInformation, circuitId);
             noderefId = ((createdNodeRefs.size() > 0) ? createdNodeRefs.get(0) : "");
             logger.info("Node created : " + noderefId);
         } catch (UploadFileNodesException e) {
