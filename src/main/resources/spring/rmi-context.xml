@@ -1,0 +1,110 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+
+    <bean id="rmiPropertiesPlaceholderConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="placeholderPrefix" value="$rmi{"/>
+        <property name="properties" ref="rmiProperties"/>
+    </bean>
+
+    <bean id="rmiProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:rmi.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="abstractPcpService" abstract="true" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="lookupStubOnStartup" value="false"/>
+        <property name="refreshStubOnConnectFailure" value="true"/>
+    </bean>
+
+    <bean id="pcpNodeService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpNodeService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPNodeService"/>
+    </bean>
+
+    <bean id="pcpOfficeExportService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpOfficeExportService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.OfficeExportService"/>
+    </bean>
+
+    <bean id="pcpTaskService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpTaskService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPTaskService"/>
+    </bean>
+
+    <bean id="pcpWorkflowService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpWorkflowService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPWorkflowService"/>
+    </bean>
+
+    <bean id="pcpUserService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpUserService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPUserService"/>
+    </bean>
+
+    <bean id="pcpSearchService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpSearchService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPSearchService"/>
+    </bean>
+
+    <bean id="pcpPreferencesService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpPreferencesService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPPreferencesService"/>
+    </bean>
+
+    <bean id="pcpConfigService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpConfigService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPConfigService"/>
+    </bean>
+
+    <bean id="pcpPictogrammeSignatureService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpPictogrammeSignatureService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPPictogrammeSignatureService"/>
+    </bean>
+
+    <bean id="pcpPdfService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpPdfService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPPdfService"/>
+    </bean>
+
+    <bean id="pcpDelegationService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpDelegationService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPDelegationService"/>
+    </bean>
+
+    <bean id="pcpDistributionSheetService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpDistributionSheetService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPDistributionSheetService"/>
+    </bean>
+
+    <bean id="pcpExtensionService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpExtensionService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPExtensionService"/>
+    </bean>
+
+    <bean id="pcpPesService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpPesService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPPESService"/>
+    </bean>
+
+    <bean id="pcpCinematiqueService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpCinematiqueService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPCinematiqueService"/>
+    </bean>
+
+    <bean id="pcpUserPreferenceService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpUserPreferenceService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.UserPreferenceService"/>
+    </bean>
+
+    <bean id="pcpSubscriberService" parent="abstractPcpService">
+        <property name="serviceUrl" value="$rmi{host}/pcpSubscriberService"/>
+        <property name="serviceInterface" value="com.cdc.pcp.common.service.PCPSubscriberService"/>
+    </bean>
+</beans>
