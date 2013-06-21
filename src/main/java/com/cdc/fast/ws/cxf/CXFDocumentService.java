@@ -13,6 +13,7 @@ import com.cdc.pcp.common.service.exception.DeleteNodesException;
 import com.cdc.pcp.common.service.exception.UploadFileNodesException;
 import com.healthmarketscience.rmiio.RemoteInputStream;
 import com.healthmarketscience.rmiio.RemoteInputStreamClient;
+import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.activation.DataHandler;
@@ -33,7 +34,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-@WebService(endpointInterface = "com.cdc.fast.ws.sei.DocumentService", portName = "DocumentPort", targetNamespace = "documentTarget", wsdlLocation = "https://proxy.cdcfast.lan/parapheur-soap/soap/v1/Documents?wsdl")
+/* wsdlLocation = "https://localhost/parapheur-soap/soap/v1/Documents?wsdl"
+* wsdlLocation = "documents.wsdl"
+*
+*/
+@WebService(endpointInterface = "com.cdc.fast.ws.sei.DocumentService", portName = "DocumentPort", targetNamespace = "documentTarget")
 public class CXFDocumentService extends AbstractCommonService implements DocumentService {
 
     private static final Logger logger = Logger.getLogger(CXFDocumentService.class.getName());
@@ -110,23 +115,7 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
 
             //
             InputStream inputStream = dataFile.getDataHandler().getInputStream();
-
-            //
-            tempFile = File.createTempFile("parapheur-", ".bin");
-            FileOutputStream outputStream = new FileOutputStream(tempFile);
-
-            //
-            byte[] buffer = new byte[1024];
-            int bytesRead = 0;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer);
-            }
-
-            //
-            outputStream.flush();
-            outputStream.close();
-            inputStream.close();
-
+            tempFile = buildTempFile(inputStream);
 
         } catch (IOException e) {
             SOAPFault fault = null;
@@ -164,7 +153,6 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
                 }
             }
 
-
             createdNodeRefs = nodeService.uploadFileNodes(Arrays.asList(new File[]{tempFile}), buildListOfOneElement(dataFile.getFilename()), buildListOfOneElement(label), buildListOfOneElement(comment), userInformation, circuitId);
             noderefId = ((createdNodeRefs.size() > 0) ? createdNodeRefs.get(0) : "");
             logger.info("Node created : " + noderefId);
@@ -181,6 +169,33 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
 
         // return the nodeRefId of the created document
         return noderefId;
+    }
+
+
+    private File buildUploadedTempFile(InputStream inputStream) throws FileUploadException, IOException {
+        return null;
+    }
+
+    private File buildTempFile(InputStream inputStream) throws IOException {
+
+        //
+
+        File tempFile;
+        tempFile = File.createTempFile("parapheur-", ".bin");
+        FileOutputStream outputStream = new FileOutputStream(tempFile);
+
+        //
+        byte[] buffer = new byte[1024];
+        int bytesRead = 0;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer);
+        }
+
+        //
+        outputStream.flush();
+        outputStream.close();
+        inputStream.close();
+        return tempFile;
     }
 
     @Override

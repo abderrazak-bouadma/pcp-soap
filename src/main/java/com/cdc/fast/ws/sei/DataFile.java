@@ -2,13 +2,6 @@ package com.cdc.fast.ws.sei;
 
 import javax.activation.DataHandler;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Utilistateur
- * Date: 17/06/13
- * Time: 17:17
- * To change this template use File | Settings | File Templates.
- */
 public class DataFile {
 
     private String filename;
