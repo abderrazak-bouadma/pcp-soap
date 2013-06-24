@@ -25,10 +25,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.soap.SOAPFaultException;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -182,18 +179,19 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
 
         File tempFile;
         tempFile = File.createTempFile("parapheur-", ".bin");
-        FileOutputStream outputStream = new FileOutputStream(tempFile);
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
+        //FileOutputStream outputStream = new FileOutputStream(tempFile);
 
         //
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[8192];
         int bytesRead = 0;
         while ((bytesRead = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer);
+            bufferedOutputStream.write(buffer);
         }
 
         //
-        outputStream.flush();
-        outputStream.close();
+        // bufferedOutputStream.flush();
+        bufferedOutputStream.close();
         inputStream.close();
         return tempFile;
     }
