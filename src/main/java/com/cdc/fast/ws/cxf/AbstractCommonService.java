@@ -58,4 +58,5 @@ public abstract class AbstractCommonService {
     protected String getUserAgent() {
         return getHttpRequest().getHeader("User-Agent");
     }
+
 }

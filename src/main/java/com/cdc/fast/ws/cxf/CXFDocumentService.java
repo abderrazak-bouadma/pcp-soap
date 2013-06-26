@@ -1,19 +1,18 @@
 package com.cdc.fast.ws.cxf;
 
-import com.cdc.fast.ws.sei.DataFile;
+import com.cdc.fast.ws.sei.DataFileVO;
 import com.cdc.fast.ws.sei.DocumentContentVO;
 import com.cdc.fast.ws.sei.DocumentService;
+import com.cdc.fast.ws.sei.MetaFileVO;
 import com.cdc.pcp.common.manager.Extension;
-import com.cdc.pcp.common.model.Abonne;
-import com.cdc.pcp.common.model.ParapheurNodeInformation;
-import com.cdc.pcp.common.model.UserInformation;
+import com.cdc.pcp.common.model.*;
 import com.cdc.pcp.common.service.PCPExtensionService;
 import com.cdc.pcp.common.service.PCPSubscriberService;
+import com.cdc.pcp.common.service.PCPWorkflowService;
 import com.cdc.pcp.common.service.exception.DeleteNodesException;
 import com.cdc.pcp.common.service.exception.UploadFileNodesException;
 import com.healthmarketscience.rmiio.RemoteInputStream;
 import com.healthmarketscience.rmiio.RemoteInputStreamClient;
-import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.activation.DataHandler;
@@ -43,6 +42,8 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
     private PCPSubscriberService subscriberService;
     @Autowired
     private PCPExtensionService extensionService;
+    @Autowired
+    private PCPWorkflowService workflowService;
 
     @Override
     public DocumentContentVO download(String documentId) {
@@ -104,14 +105,14 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
     }
 
     @Override
-    public String upload(String label, String comment, String subscriberId, String circuitId, DataFile dataFile) {
+    public String upload(String label, String comment, String subscriberId, String circuitId, DataFileVO dataFileVO) {
 
         // create temp file
         File tempFile = null;
         try {
 
             //
-            InputStream inputStream = dataFile.getDataHandler().getInputStream();
+            InputStream inputStream = dataFileVO.getDataHandler().getInputStream();
             tempFile = buildTempFile(inputStream);
 
         } catch (IOException e) {
@@ -150,7 +151,7 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
                 }
             }
 
-            createdNodeRefs = nodeService.uploadFileNodes(Arrays.asList(new File[]{tempFile}), buildListOfOneElement(dataFile.getFilename()), buildListOfOneElement(label), buildListOfOneElement(comment), userInformation, circuitId);
+            createdNodeRefs = nodeService.uploadFileNodes(Arrays.asList(new File[]{tempFile}), buildListOfOneElement(dataFileVO.getFilename()), buildListOfOneElement(label), buildListOfOneElement(comment), userInformation, circuitId);
             noderefId = ((createdNodeRefs.size() > 0) ? createdNodeRefs.get(0) : "");
             logger.info("Node created : " + noderefId);
         } catch (UploadFileNodesException e) {
@@ -168,10 +169,6 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
         return noderefId;
     }
 
-
-    private File buildUploadedTempFile(InputStream inputStream) throws FileUploadException, IOException {
-        return null;
-    }
 
     private File buildTempFile(InputStream inputStream) throws IOException {
 
@@ -199,8 +196,35 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
     @Override
     public void delete(String documentId) {
         try {
-            nodeService.deleteNodesList(Arrays.asList(new String[]{documentId}));
+            String result = nodeService.deleteNodesList(Arrays.asList(new String[]{documentId}));
         } catch (DeleteNodesException e) {
+            SOAPFault fault = null;
+            try {
+                fault = SOAPFactory.newInstance().createFault();
+                fault.setFaultString(e.getMessage());
+                fault.setFaultCode("PCP_REMOVE_ERROR");
+                throw new SOAPFaultException(fault);
+            } catch (SOAPException e1) {
+                throw new RuntimeException(e1);
+            }
+        }
+    }
+
+    @Override
+    public String sendMeta(MetaFileVO meta) {
+
+        // TODO do validation
+
+        // prepare data
+        MetaDataList metaDataList = new MetaDataList();
+        for (MetaData metaData : meta.getMetaDataList()) {
+            metaDataList.addMetaData(metaData);
+        }
+
+        // make service call
+        try {
+            return workflowService.defineMetaData(metaDataList, meta.getDocumentId(), userService.getUserInformation(getUsername()));
+        } catch (Exception e) {
             SOAPFault fault = null;
             try {
                 fault = SOAPFactory.newInstance().createFault();

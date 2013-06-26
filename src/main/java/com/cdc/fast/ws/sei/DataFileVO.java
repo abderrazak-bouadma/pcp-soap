@@ -2,9 +2,10 @@ package com.cdc.fast.ws.sei;
 
 import javax.activation.DataHandler;
 
-public class DataFile {
+public class DataFileVO {
 
     private String filename;
+
     private DataHandler dataHandler;
 
     public String getFilename() {
