@@ -19,6 +19,9 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.jws.WebService;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
@@ -169,7 +172,6 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
         return noderefId;
     }
 
-
     private File buildTempFile(InputStream inputStream) throws IOException {
 
         //
@@ -213,7 +215,8 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
     @Override
     public String sendMeta(MetaFileVO meta) {
 
-        // TODO do validation
+        // build meta data list from uploaded XML Stream
+
 
         // prepare data
         MetaDataList metaDataList = new MetaDataList();
@@ -230,6 +233,54 @@ public class CXFDocumentService extends AbstractCommonService implements Documen
                 fault = SOAPFactory.newInstance().createFault();
                 fault.setFaultString(e.getMessage());
                 fault.setFaultCode("PCP_REMOVE_ERROR");
+                throw new SOAPFaultException(fault);
+            } catch (SOAPException e1) {
+                throw new RuntimeException(e1);
+            }
+        }
+    }
+
+    @Override
+    public String uploadMeta(String documentId, @XmlMimeType("application/xml") DataHandler dataHandler) {
+
+
+        try {
+
+            // load XML Stream
+            Object content = dataHandler.getContent();
+            InputStream inputStream = (InputStream) content;
+            String contentType = dataHandler.getContentType();
+
+            /*
+            BOMInputStream bomInputStream = new BOMInputStream(inputStream);
+            if (bomInputStream.hasBOM(ByteOrderMark.UTF_8)) {
+                bomInputStream.skip(ByteOrderMark.UTF_8.length());
+            }
+            */
+
+            // dump stream
+            byte[] buffer = new byte[1024];
+            while (inputStream.read(buffer) != -1) {
+                for (int i = 0; i < buffer.length; i++) {
+                    System.out.println((char) buffer[i] + "-" + buffer[i]);
+                }
+            }
+
+
+            // build Object
+            JAXBContext jaxbContext = JAXBContext.newInstance(MetaDataList.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            MetaDataList metaDataList = (MetaDataList) unmarshaller.unmarshal(inputStream);
+
+            // make remote service call
+            return workflowService.defineMetaData(metaDataList, documentId, userService.getUserInformation(getUsername()));
+
+        } catch (Exception e) {
+            try {
+                SOAPFault fault = null;
+                fault = SOAPFactory.newInstance().createFault();
+                fault.setFaultString(e.getMessage());
+                fault.setFaultCode("PCP_UPLOAD_META_ERROR");
                 throw new SOAPFaultException(fault);
             } catch (SOAPException e1) {
                 throw new RuntimeException(e1);

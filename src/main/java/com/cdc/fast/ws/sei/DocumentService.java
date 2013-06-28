@@ -1,5 +1,6 @@
 package com.cdc.fast.ws.sei;
 
+import javax.activation.DataHandler;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -40,5 +41,8 @@ public interface DocumentService {
      */
     @WebMethod(operationName = "send-doc-metadata")
     String sendMeta(@WebParam(name = "xml-meta-data", mode = WebParam.Mode.IN) MetaFileVO metaDataFile);
+
+    @WebMethod(operationName = "uploadMeta")
+    String uploadMeta(@WebParam(name = "documentId", mode = WebParam.Mode.IN) String documentId, DataHandler dataHandler);
 
 }

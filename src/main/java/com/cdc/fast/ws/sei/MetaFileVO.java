@@ -2,8 +2,13 @@ package com.cdc.fast.ws.sei;
 
 import com.cdc.pcp.common.model.MetaData;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
+@XmlRootElement(name = "meta")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class MetaFileVO {
 
     private String documentId;
